@@ -407,7 +407,7 @@ function closeTalk() { GS.talk = null; $('talk').classList.add('hidden'); }
 let voteKey = '';
 function renderVote() {
   const S = S_(), v = S && playing() ? S.vote : null, el = $('vote');
-  if (!v) { if (voteKey) { el.classList.add('hidden'); voteKey = ''; } return; }
+  if (!v) { if (voteKey) { el.classList.add('hidden'); voteKey = ''; $('toasts').style.top = ''; } return; }
   const c = caseOf(S), s = c.suspects.find((q) => q.id === v.c), x = clueById(S, v.e), voters = votersOf(S), n = voters.filter((p) => v.yes[p]).length;
   const mine = !!v.yes[GS.pid], key = v.by + v.c + v.e + n + mine + voters.length;
   if (key === voteKey) return; voteKey = key; el.classList.remove('hidden');
@@ -415,6 +415,7 @@ function renderVote() {
     (mine ? '<div class="btnrow"><button class="btn alt small" data-a="voteNo">CANCEL</button></div><div class="vs">Waiting for your partner to agree\u2026</div>'
       : '<div class="btnrow"><button class="btn green small" data-a="voteYes" id="bVoteYes">AGREE</button><button class="btn alt small" data-a="voteNo" id="bVoteNo">NOT YET</button></div>');
   if (!mine) Snd.fx('vote');
+  $('toasts').style.top = Math.round(el.getBoundingClientRect().bottom + 8) + 'px';
 }
 
 /* ---------------- events ---------------- */
@@ -576,7 +577,7 @@ function renderScreens() {
   ['scrTitle', 'scrOnline', 'scrCases'].forEach((id) => $(id).classList.toggle('hidden', id !== scr));
   const inGame = playing();
   $('hud').classList.toggle('hidden', !inGame);
-  if (!inGame) { closeTalk(); if (GS.panel && GS.panel !== 'result') closePanel(); $('vote').classList.add('hidden'); voteKey = ''; }
+  if (!inGame) { closeTalk(); if (GS.panel && GS.panel !== 'result') closePanel(); $('vote').classList.add('hidden'); voteKey = ''; $('toasts').style.top = ''; }
   if (scr === 'scrTitle') { const n = Object.keys(save.solved).length; $('titleFoot').textContent = GD.CASES.length + ' mysteries \u00b7 5 places to explore \u00b7 solo or online co-op' + (n ? ' \u00b7 solved ' + n + '/' + GD.CASES.length : ''); }
   if (scr === 'scrCases') {
     const online = GS.role !== 'solo', code = online && GS.room ? GS.room.code : '';
@@ -584,7 +585,7 @@ function renderScreens() {
     if (key !== lastCasesKey) {
       lastCasesKey = key;
       $('roomCode').innerHTML = code ? 'ROOM CODE<b>' + esc(code) + '</b>Friends tap PLAY ONLINE CO-OP \u2192 JOIN' : ''; $('roomCode').classList.toggle('hidden', !code);
-      $('lobbyPlayers').innerHTML = online ? S.players.map((p) => '<div class="pchip" style="--c:' + esc(p.color) + '"><i></i>' + esc(p.name) + (p.host ? ' \u2605' : '') + (p.pid === GS.pid ? ' (you)' : '') + '</div>').join('') + (S.players.length < 3 ? '<div class="pchip empty">' + (S.players.length < 2 ? 'Waiting for a friend\u2026' : 'Open seat') + '</div>' : '') : '';
+      const TC = teamColors(S); $('lobbyPlayers').innerHTML = online ? S.players.map((p) => '<div class="pchip" style="--c:' + esc(TC[p.pid] || p.color) + '"><i></i>' + esc(p.name) + (p.host ? ' \u2605' : '') + (p.pid === GS.pid ? ' (you)' : '') + '</div>').join('') + (S.players.length < 3 ? '<div class="pchip empty">' + (S.players.length < 2 ? 'Waiting for a friend\u2026' : 'Open seat') + '</div>' : '') : '';
       $('casesTitle').textContent = online ? 'CO-OP CASE FILES' : 'CHOOSE A CASE';
       $('caseList').innerHTML = casesHTML(S);
       $('casesWait').textContent = GS.role === 'client' ? 'The host picks the case\u2026' : online && S.players.length < 2 ? 'Share the code! You can also start now; friends can join any time.' : '';
@@ -639,15 +640,21 @@ function ensureAvatar(pid, color, name, isMe) {
   }
   return a;
 }
+// co-op: two friends with the same color get distinct ones (by join order)
+function teamColors(S) {
+  const out = {}, used = {};
+  S.players.forEach((p) => { let c = GN.cleanColor(p.pid === GS.pid ? prof.color : p.color); if (used[c]) c = PALETTE.find((q) => !used[q]) || c; used[c] = 1; out[p.pid] = c; });
+  return out;
+}
 function updateAvatars(dt) {
-  const S = S_(), mates = S.players.filter((p) => p.pid !== GS.pid), coop = S.players.length > 1;
+  const S = S_(), TC = teamColors(S), mates = S.players.filter((p) => p.pid !== GS.pid), coop = S.players.length > 1;
   // me
-  const me = ensureAvatar(GS.pid, prof.color, myName(), true);
+  const me = ensureAvatar(GS.pid, TC[GS.pid] || prof.color, myName(), true);
   me.tag.visible = coop;
   me.ch.g.position.set(GS.me.x, 0, GS.me.z); me.ch.g.rotation.y = GS.me.yaw; me.ch.g.visible = true; me.ch.anim(dt, GS.me.sp);
   const live = {}; live[GS.pid] = 1;
   mates.forEach((p) => {
-    live[p.pid] = 1; const pos = GS.pos[p.pid], a = ensureAvatar(p.pid, GN.cleanColor(p.color), p.name, false);
+    live[p.pid] = 1; const pos = GS.pos[p.pid], a = ensureAvatar(p.pid, TC[p.pid] || GN.cleanColor(p.color), p.name, false);
     if (!pos || pos.a !== GS.me.area) { a.ch.g.visible = false; a.init = false; return; }
     if (!a.init) { a.x = pos.x; a.z = pos.z; a.yaw = pos.r; a.init = true; }
     const k = 1 - Math.exp(-dt * 12), ox = a.x, oz = a.z;
@@ -692,7 +699,7 @@ function updateHUD() {
   $('bLens').classList.toggle('cd', GS.lensCd > 0 && GS.lensT <= 0); $('bLens').classList.toggle('on', GS.lensT > 0); $('lensCd').textContent = Math.ceil(GS.lensCd);
   const mates = S.players.filter((p) => p.pid !== GS.pid);
   const mk = mates.map((p) => p.pid + (GS.pos[p.pid] ? GS.pos[p.pid].a : '')).join('|');
-  if (mk !== updateHUD.mk) { updateHUD.mk = mk; $('mates').innerHTML = mates.map((p) => '<div class="mate" style="--c:' + esc(p.color) + '">\ud83d\udd75\ufe0f ' + esc(p.name) + ' \u00b7 ' + esc(GS.pos[p.pid] ? areaName(GS.pos[p.pid].a) : '\u2026') + '</div>').join(''); }
+  if (mk !== updateHUD.mk) { updateHUD.mk = mk; const TC = teamColors(S); $('mates').innerHTML = mates.map((p) => '<div class="mate" style="--c:' + esc(TC[p.pid] || p.color) + '">\ud83d\udd75\ufe0f ' + esc(p.name) + ' \u00b7 ' + esc(GS.pos[p.pid] ? areaName(GS.pos[p.pid].a) : '\u2026') + '</div>').join(''); }
   $('accBadge') && 0;
 }
 let last = performance.now(), titleT = 0;
