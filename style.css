@@ -81,7 +81,7 @@ input { font-family: inherit; font-weight: 800; font-size: 20px; padding: 10px 1
 #sidebtns { position: absolute; right: calc(8px + var(--sr)); top: calc(70px + var(--st)); display: flex; flex-direction: column; gap: 8px; }
 .sbtn { position: relative; width: 74px; height: 66px; border-radius: 18px; border: 3px solid #fff; background: rgba(27,20,64,.8); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; box-shadow: 0 4px 0 rgba(0,0,0,.25); }
 .sbtn i { font-style: normal; font-size: 26px; line-height: 1; }
-.sbtn span { font-size: 11px; letter-spacing: .5px; }
+.sbtn span { font-size: 12px; letter-spacing: .5px; }
 .sbtn.acc { background: linear-gradient(180deg,#ff6b7d,#c81f3a); }
 .sbtn em { position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; border-radius: 50%; background: #ffd23f; border: 3px solid #fff; }
 .sbtn:active { transform: scale(.94); }
@@ -90,6 +90,7 @@ input { font-family: inherit; font-weight: 800; font-size: 20px; padding: 10px 1
 #joyzone { position: absolute; left: 0; bottom: 0; width: 48%; height: 34%; pointer-events: auto; touch-action: none; }
 #joybase { position: absolute; left: 90px; top: 50%; width: 120px; height: 120px; margin: -60px 0 0 -60px; border-radius: 50%; background: rgba(255,255,255,.18); border: 4px solid rgba(255,255,255,.55); }
 #joyknob { position: absolute; left: 50%; top: 50%; width: 56px; height: 56px; margin: -28px 0 0 -28px; border-radius: 50%; background: rgba(255,255,255,.9); border: 3px solid #1b1440; }
+#joyhint small { font-size: 12px; }
 #joyhint { position: absolute; left: 12px; right: 0; bottom: calc(10px + var(--sb)); font-size: 13px; color: rgba(255,255,255,.85); text-shadow: 0 2px 2px rgba(0,0,0,.6); text-align: left; }
 #bAct { position: absolute; right: calc(16px + var(--sr)); bottom: calc(22px + var(--sb)); width: 112px; height: 112px; border-radius: 50%; border: 5px solid #fff; background: radial-gradient(circle at 40% 35%, #ffd76b, #e08a00); color: #3a2400; font-size: 20px; font-weight: 900; box-shadow: 0 6px 0 rgba(0,0,0,.3); }
 #bAct.dim { background: radial-gradient(circle at 40% 35%, #8a80b0, #4b3b8a); color: #e0dcff; font-size: 17px; }
@@ -97,7 +98,7 @@ input { font-family: inherit; font-weight: 800; font-size: 20px; padding: 10px 1
 #bAct:active { transform: scale(.94); }
 #bLens { position: absolute; right: calc(136px + var(--sr)); bottom: calc(30px + var(--sb)); width: 72px; height: 72px; border-radius: 50%; border: 4px solid #fff; background: radial-gradient(circle at 40% 35%, #c4b5fd, #6d28d9); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: 0 5px 0 rgba(0,0,0,.3); }
 #bLens i { font-style: normal; font-size: 28px; line-height: 1; }
-#bLens span { font-size: 11px; }
+#bLens span { font-size: 12px; }
 #bLens b { position: absolute; inset: 0; border-radius: 50%; background: rgba(20,10,50,.65); display: none; align-items: center; justify-content: center; font-size: 22px; }
 #bLens.cd b { display: flex; }
 #bLens.on { box-shadow: 0 0 0 4px #ffd23f, 0 0 24px #ffd23f; }
@@ -181,4 +182,8 @@ body.kbd #joyzone { display: none; }
   #bAct { width: 96px; height: 96px; }
   #bLens { right: calc(122px + var(--sr)); }
   #joyzone { height: 50%; width: 40%; }
+}
+@media (max-width: 600px) and (orientation: portrait) {
+  #toasts { left: 10px; transform: none; width: calc(100vw - 112px); align-items: flex-start; }
+  .toast { font-size: 15px; text-align: left; }
 }

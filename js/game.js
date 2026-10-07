@@ -484,6 +484,11 @@ addEventListener('blur', () => { for (const k in keys) keys[k] = false; });
 function tapAt(x, y) {
   if (!playing() || GS.panel || GS.talk) return;
   const r = W.pick(x, y); if (!r) return;
+  if (!r.hot && W.cur) { // fat-finger assist: snap to a nearby object/person on screen
+    let best = null, bd = 46;
+    for (const h of W.cur.hots) { if (!h.g.visible) continue; for (const yy of [0.4, h.h * 0.55]) { const p = W.project(h.x, yy, h.z), d = Math.hypot(p.x - x, p.y - y); if (p.vis && d < bd) { bd = d; best = h; } } }
+    if (best) r.hot = best;
+  }
   if (r.hot) {
     const h = r.hot, d = Math.hypot(h.x - GS.me.x, h.z - GS.me.z);
     if (d <= h.reach) interact(h); else { GS.goal = { x: h.x, z: h.z, hot: h, t: 0, best: d, stuck: 0 }; W.tapMark(h.x, h.z); }
