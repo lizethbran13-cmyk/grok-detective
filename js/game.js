@@ -325,8 +325,8 @@ function openBook(tab) {
     h += GD.AREA_ORDER.map((a) => { const n = L[a] || 0; return '<div class="lead' + (n ? '' : ' done') + '">' + GD.AREAS[a].icon + ' <b>' + esc(areaName(a)) + '</b>: ' + (n ? n + ' clue' + (n > 1 ? 's' : '') + ' still hidden' : 'nothing left \u2713') + '</div>'; }).join('');
     const nt = GD.people(c).filter((p) => (p.kind === 'suspect' && !S.talked[p.id]) || (p.gives && !S.found[p.gives]));
     if (nt.length) h += '<h3>STILL TO INTERVIEW</h3>' + nt.map((p) => '<div class="lead">\ud83d\udcac <b>' + esc(p.name) + '</b> (' + esc(p.role) + ') at the ' + esc(areaName(p.area)) + '</div>').join('');
-    const trF = cl.filter((x) => x.kind === 'trait' && S.found[x.id]).length;
-    h += '<div class="hunch">\ud83d\udd75\ufe0f <b>Detective\u2019s hunch:</b> ' + (found.length === cl.length ? 'You have every clue! Two clues describe the culprit. Find the ONE suspect who matches both, then tap ACCUSE.' : trF ? 'Some clues describe what the culprit is like. Compare them with the SUSPECTS tab. Who matches?' : 'Look for clues that describe the culprit, like footprints, threads or what a witness saw. Use the LENS if you are stuck!') + '</div>';
+    const trF = cl.filter((x) => x.kind === 'trait' && S.found[x.id]).length, nTr = cl.filter((x) => x.kind === 'trait').length;
+    h += '<div class="hunch">\ud83d\udd75\ufe0f <b>Detective\u2019s hunch:</b> ' + (found.length === cl.length ? 'You have every clue! ' + (nTr === 3 ? 'Three' : 'Two') + ' clues describe the culprit. Find the ONE suspect who matches ' + (nTr === 3 ? 'all three' : 'both') + ', then tap ACCUSE.' : trF ? 'Some clues describe what the culprit is like. Compare them with the SUSPECTS tab. Who matches?' : 'Look for clues that describe the culprit, like footprints, threads or what a witness saw. Use the LENS if you are stuck!') + '</div>';
   }
   openPanel('book', h);
 }

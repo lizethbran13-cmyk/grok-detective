@@ -17,7 +17,7 @@ GD.AREAS = {
       { id: 'town_bench', name: 'Park Bench', kind: 'bench', x: -6, z: 4, text: 'Someone left half a sandwich here. Yuck.' },
       { id: 'town_cart', name: 'Flower Cart', kind: 'cart', x: 7, z: 4, text: 'Tulips, daisies and sunflowers. Very pretty.' },
       { id: 'town_trash', name: 'Trash Can', kind: 'trash', x: -11, z: 4.5, text: 'Banana peels and old newspapers.' },
-      { id: 'town_fountain', name: 'Fountain', kind: 'fountain', x: 0, z: -1.5, r: 2.4, text: 'Shiny wishing coins at the bottom. Make a wish!' },
+      { id: 'town_fountain', name: 'Fountain', kind: 'fountain', x: 0, z: -1.5, r: 3.2, text: 'Shiny wishing coins at the bottom. Make a wish!' },
       { id: 'town_lamp', name: 'Lamp Post', kind: 'lamp', x: 3, z: 6, text: 'A tall old lamp post. A moth flutters around it.' },
       { id: 'town_bush', name: 'Hedge', kind: 'bush', x: -2.5, z: -8.5, text: 'Leaves, twigs and a very surprised squirrel.' }
     ],
@@ -280,6 +280,59 @@ GD.CASES = [
         no: { name: 'Sticky Fingerprints', text: 'Sticky fingerprints all over the window sill. The thief was NOT wearing gloves.' } }
     ],
     extras: [{ id: 'x_window', name: 'Cabin Window', kind: 'window', area: 'forest', pos: [[9.2, -9.85]], rotN: true, text: 'The cabin\'s back window.' }]
+  },
+  {
+    id: 'crown', title: 'The Mayor\'s Missing Crown', icon: '\ud83d\udc51', color: '#c084fc', diff: 'Hard', scene: 'town',
+    intro: 'Mayor Maple\'s golden parade crown vanished from the Town Square stage the night before the Grok City Parade! Five people had a key to the stage. This case is TRICKY: THREE clues describe the thief, so you need all three to be sure.',
+    traits: [{ k: 'bike', label: 'Gets around by', yes: 'Bike', no: 'Walking' }, { k: 'mint', label: 'Favorite gum', yes: 'Mint gum', no: 'Cherry gum' }, { k: 'whistle', label: 'Happy habit', yes: 'Whistles', no: 'Hums' }],
+    victim: { id: 'maple', name: 'Mayor Maple', role: 'Mayor of Grok City', area: 'town', spot: 0, look: { skin: SK[1], hair: '#6b4226', hs: 'short', shirt: '#7c3aed', pants: '#1e1b4b', hat: '#111', hs2: 'top', beard: true },
+      lines: ['Detective! My golden parade crown is GONE, and the parade is tomorrow!', 'I locked it on the stage at 9 PM. At 10 PM the pillow was empty.', 'Five people have a stage key. Ask how they get around, what gum they chew, and if they whistle or hum!', 'This one is tricky. You need THREE clues. Your LENS will help if you get stuck.'] },
+    suspects: [
+      { id: 'benny', name: 'Benny', role: 'Bike Courier', area: 'town', spot: 4, t: { bike: 1, mint: 1, whistle: 0 },
+        look: { skin: SK[2], hair: '#111', hs: 'spiky', shirt: '#f97316', pants: '#1e3a8a', hat: '#22c55e', hs2: 'cap' },
+        lines: ['Hey! Benny, fastest courier in Grok City!', 'Last night? Delivering pizzas all over town until midnight.', 'I go everywhere on my BIKE. Zoom zoom!', 'I chew MINT gum all day, and I HUM while I ride. Hmm-hmm-hmmm!'],
+        motive: { name: 'Bike Shop Bill', text: 'A bill for Benny: "New golden wheels: 400 coins. Pay by Friday!"', spots: ['town_cart', 'town_stall', 'town_bench'] },
+        confess: 'I really wanted those golden wheels... I was going to sell the crown. It\'s in my delivery bag. I\'m sorry, Mayor!' },
+      { id: 'olga', name: 'Olga', role: 'Opera Singer', area: 'mansion', spot: 2, t: { bike: 0, mint: 0, whistle: 0 },
+        look: { skin: SK[0], hair: '#f59e0b', hs: 'bun', shirt: '#be185d', pants: '#831843', dress: true, scarf: '#fde047' },
+        lines: ['Darling! I am Olga, the greatest singer in Grok City!', 'Last night I was rehearsing my parade song here at the mansion.', 'A bike? Never! I WALK everywhere, like a queen.', 'CHERRY gum keeps my voice sweet. And I never whistle, darling. I HUM! La-la-laaa!'],
+        motive: { name: 'Costume Note', text: 'Olga\'s note: "Parade costume: Queen of Song. STILL NEED A CROWN!!"', spots: ['man_wardrobe', 'man_piano', 'man_painting'] },
+        confess: 'My Queen of Song costume needed a real crown! I only wanted to wear it for one song. It\'s in my hat box.' },
+      { id: 'tom', name: 'Tom', role: 'Tour Guide', area: 'museum', spot: 2, t: { bike: 0, mint: 1, whistle: 1 },
+        look: { skin: SK[3], hair: '#3b2414', hs: 'short', shirt: '#0ea5e9', pants: '#334155', hat: '#fde68a', hs2: 'floppy', glasses: true },
+        lines: ['Welcome, welcome! I\'m Tom, your friendly tour guide.', 'Last night I was planning tomorrow\'s museum tours.', 'I WALK every tour. Good for the legs!', 'I love MINT gum, and I WHISTLE to keep my tour groups together. Fweeet!'],
+        motive: { name: 'Exhibit Plan', text: 'Tom\'s plan: "New exhibit: CROWNS OF GROK CITY. Star item: the Mayor\'s crown!"', spots: ['mus_guard', 'mus_shop', 'mus_plant'] },
+        confess: 'It would have been the best exhibit ever! I hid the crown in the gift shop. I\'ll give it back right now.' },
+      { id: 'skip', name: 'Skip', role: 'Ship\'s Cook', area: 'docks', spot: 1, t: { bike: 1, mint: 0, whistle: 1 },
+        look: { skin: SK[1], hair: '#e5e7eb', hs: 'bald', shirt: '#fff', pants: '#0f172a', hat: '#fff', hs2: 'chef', beard: true, tall: true },
+        lines: ['Ahoy! Skip, cook of the good ship Biscuit.', 'Last night I was baking 300 muffins for the parade.', 'I ride my old BIKE up and down the docks.', 'CHERRY gum, always. And I WHISTLE while I cook. Fwee-fwee!'],
+        motive: { name: 'Cake Contest Entry', text: 'Skip\'s entry: "King\'s Crown Cake. Topped with a REAL golden crown to win first prize!"', spots: ['dock_barrel', 'dock_crates', 'dock_office'] },
+        confess: 'I wanted to win the cake contest with a real crown on top! It\'s in my kitchen, a bit sticky. Sorry, Mayor!' },
+      { id: 'willow', name: 'Willow', role: 'Woodcarver', area: 'forest', spot: 3, t: { bike: 1, mint: 1, whistle: 1 },
+        look: { skin: SK[4], hair: '#7c2d12', hs: 'long', shirt: '#65a30d', pants: '#78350f', hat: '#a16207', hs2: 'beanie', gloves: '#d6a46b' },
+        lines: ['Oh, hi! I\'m Willow. I carve wooden toys in this cabin.', 'Last night I was carving a wooden duck by the stove.', 'I ride my BIKE into town on market days.', 'Fresh MINT gum helps me focus, and I WHISTLE with the birds. Tweet tweet!'],
+        motive: { name: 'Carving Sketch', text: 'Willow\'s sketch: "Carve a wooden crown for the parade. Need the REAL one to copy it perfectly!"', spots: ['for_woodpile', 'for_table', 'for_stump'] },
+        confess: 'I only borrowed it to copy for my carving! It\'s wrapped in a blanket in my chest. I should have asked.' }
+    ],
+    witness: { id: 'pip', name: 'Pip', role: 'Paper Kid', area: 'town', spot: 2, gives: 'tC', look: { skin: SK[0], hair: '#f5d0a9', hs: 'short', shirt: '#facc15', pants: '#1e40af', hat: '#ef4444', hs2: 'cap' },
+      lines: ['Extra! Extra! Hi, I\'m Pip. I deliver the newspaper!', 'Last night I was folding papers behind the fountain. Someone sneaked off the stage!', '{clue}', 'Put THAT in the newspaper!'] },
+    clues: [
+      { id: 'sc1', name: 'Empty Crown Pillow', text: 'The crown pillow is empty. The lock was opened with a real stage key, so the thief is one of the five key holders.', spots: ['x_stage'] },
+      { id: 'sc2', name: 'Parade Schedule', text: 'Parade schedule: "Crown locked on stage at 9 PM." Someone scribbled: "Stage dark from 9:30 to 10."', spots: ['town_board', 'town_mailbox', 'town_phone'] },
+      { id: 'tA', trait: 'bike', spots: ['x_tracks'],
+        yes: { name: 'Bike Tracks', text: 'Thin BIKE tire tracks lead away from the stage. The thief rode a BIKE.' },
+        no: { name: 'Shoe Prints', text: 'Only shoe prints lead away from the stage. No bike tracks at all. The thief WALKED.' } },
+      { id: 'tB', trait: 'mint', spots: ['town_trash', 'town_bush', 'town_lamp'],
+        yes: { name: 'Mint Gum Wrapper', text: 'A green MINT gum wrapper dropped near the stage. It still smells minty! The thief chews MINT gum.' },
+        no: { name: 'Cherry Gum Wrapper', text: 'A red CHERRY gum wrapper dropped near the stage. Still sticky! The thief chews CHERRY gum.' } },
+      { id: 'tC', trait: 'whistle', witness: true,
+        yes: { name: 'Pip\'s Testimony', text: 'Pip heard the thief WHISTLING a happy tune while running away. Fweet fweet!' },
+        no: { name: 'Pip\'s Testimony', text: 'Pip heard the thief HUMMING a tune while running away. Not whistling, humming!' } }
+    ],
+    extras: [
+      { id: 'x_stage', name: 'Parade Stage', kind: 'stage', area: 'town', pos: [[-8, 8.4], [8.5, 8.2]], text: 'The parade stage.' },
+      { id: 'x_tracks', name: 'Muddy Ground', kind: 'tracks', area: 'town', pos: [[-10.5, 0.8], [11, 7]], text: 'Some marks in the mud.' }
+    ]
   }
 ];
 GD.caseById = (id) => GD.CASES.find((c) => c.id === id);

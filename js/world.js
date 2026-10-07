@@ -232,6 +232,8 @@ const P = {
   prints(g) { for (let i = 0; i < 6; i++) { const f = B(0.2, 0.02, 0.34, '#5b3a1f', (i % 2 ? 0.18 : -0.18), 0.01, -i * 0.55 + 1.2, g); f.rotation.y = 0.2; } return null; },
   box(g) { B(1.2, 0.9, 0.7, '#e2e8f0', 0, 0, 0, g); B(0.5, 0.35, 0.4, '#f9a8d4', 0, 0.9, 0, g); B(0.52, 0.06, 0.42, '#db2777', 0, 1.25, 0, g); return { w: 1.2, d: 0.8 }; },
   hook(g) { B(0.15, 2.2, 0.15, DWOOD, 0, 0, 0, g); B(0.7, 0.12, 0.12, DWOOD, -0.3, 2.1, 0, g); add(G.torus, M('#9ca3af'), -0.6, 1.95, 0, 0.1, 0.1, 1, g); return { r: 0.3 }; },
+  stage(g) { B(2.4, 0.5, 1.6, '#7c3aed', 0, 0, 0, g); B(2.5, 0.08, 1.7, '#fde047', 0, 0.5, 0, g); C(0.22, 0.55, '#f8fafc', 0, 0.58, 0, g); B(0.56, 0.12, 0.56, '#dc2626', 0, 1.13, 0, g); [-1.1, 1.1].forEach((x) => { B(0.08, 1.9, 0.08, '#f8fafc', x, 0.5, -0.7, g); B(0.5, 0.32, 0.03, x < 0 ? '#ef4444' : '#38bdf8', x + 0.27, 2.05, -0.7, g); }); return { w: 2.5, d: 1.7 }; },
+  tracks(g) { B(1.6, 0.015, 2.6, '#8b6a45', 0, 0.005, 0, g); for (let i = 0; i < 9; i++) { const f = B(0.1, 0.02, 0.36, '#4a2f17', Math.sin(i * 0.7) * 0.35, 0.015, -i * 0.3 + 1.2, g); f.rotation.y = Math.cos(i * 0.7) * 0.4; } return null; },
   sign(g) { B(0.14, 1.6, 0.14, DWOOD, 0, 0, 0, g); const a = B(1.3, 0.45, 0.1, '#38bdf8', 0.25, 1.25, 0, g); B(1.0, 0.35, 0.1, '#0ea5e9', -0.1, 0.75, 0, g).rotation.y = Math.PI; return { r: 0.35 }; }
 };
 function tree(x, z, p, s) { s = s || 1; C(0.25 * s, 1.4 * s, '#7c4a2a', x, 0, z, p, true); CN(1.3 * s, 2.2 * s, '#15803d', x, 1.1 * s, z, p); CN(1.0 * s, 1.8 * s, '#16a34a', x, 2.2 * s, z, p); }
@@ -330,7 +332,7 @@ function placeObj(o, g, cols, areaId) {
   const cl = (P[o.kind] || P.crate)(og);
   if (cl) { if (cl.r) cols.push({ c: 1, x: o.x, z: o.z, r: cl.r }); else { const sw = Math.abs(Math.sin(og.rotation.y)) > 0.5; const w = sw ? cl.d : cl.w, d = sw ? cl.w : cl.d; cols.push({ x0: o.x - w / 2, x1: o.x + w / 2, z0: o.z - d / 2, z1: o.z + d / 2 }); } }
   const ext = cl ? (cl.r || Math.max(cl.w, cl.d) / 2) : (o.kind === 'rug' ? 1.2 : 0.6);
-  const h = { id: o.id, name: o.name, kind: 'obj', x: o.x, z: o.z, reach: o.r || Math.min(2.2, ext + 1.1), g: og, h: o.kind === 'rug' || o.kind === 'prints' ? 0.9 : o.kind === 'dino' ? 3.3 : 2.4, text: o.text, extra: o.extra };
+  const h = { id: o.id, name: o.name, kind: 'obj', x: o.x, z: o.z, reach: o.r || Math.min(2.2, ext + 1.1), g: og, h: o.kind === 'rug' || o.kind === 'prints' || o.kind === 'tracks' ? 0.9 : o.kind === 'dino' ? 3.3 : 2.4, text: o.text, extra: o.extra };
   if (A.outdoor === false && o.z < -A.d / 2 + 1.2) h.h = Math.max(h.h, 2.6);
   tagHot(h); addMarker(h, 'q', g); return h;
 }
