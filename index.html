@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="theme-color" content="#2a1d46" />
+  <title>GROK DETECTIVE</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232a1d46'/%3E%3Ccircle cx='27' cy='27' r='15' fill='%23bfe9ff' stroke='%23ffd23f' stroke-width='6'/%3E%3Cpath d='M38 38l16 16' stroke='%23ffd23f' stroke-width='8' stroke-linecap='round'/%3E%3C/svg%3E" />
+</head>
+<body>
+  <canvas id="c"></canvas>
+
+  <div id="hud" class="hidden">
+    <div id="topbar">
+      <div id="casePill"><span id="cpIcon"></span><div><div id="cpTitle"></div><div id="cpSub"><span id="cpArea"></span> &middot; <b id="cpClues"></b></div></div></div>
+      <button id="bMute" class="rbtn" type="button" aria-label="Sound">&#9835;</button>
+      <button id="bMenu" class="rbtn" type="button" aria-label="Menu">&#9776;</button>
+    </div>
+    <div id="mates"></div>
+    <div id="sidebtns">
+      <button id="bBook" class="sbtn" type="button"><i>&#128210;</i><span>CASEBOOK</span><em id="bookDot" class="hidden"></em></button>
+      <button id="bMap" class="sbtn" type="button"><i>&#128506;&#65039;</i><span>MAP</span></button>
+      <button id="bAccuse" class="sbtn acc" type="button"><i>&#9878;&#65039;</i><span>ACCUSE</span></button>
+    </div>
+    <div id="prompt" class="hidden"></div>
+    <div id="joyzone"><div id="joybase"><div id="joyknob"></div></div><div id="joyhint">DRAG TO WALK<br><small>or tap a spot</small></div></div>
+    <button id="bLens" type="button"><i>&#128269;</i><span>LENS</span><b id="lensCd"></b></button>
+    <button id="bAct" type="button"><span id="actT">LOOK</span></button>
+    <div id="kbdhelp">WASD move &middot; E search/talk &middot; Q lens &middot; C casebook &middot; V map &middot; X accuse</div>
+  </div>
+  <div id="toasts"></div>
+
+  <!-- title -->
+  <div id="scrTitle" class="screen">
+    <div class="card title">
+      <div class="logo"><span class="lg1">GROK</span><span class="lg2">DETECTIVE</span></div>
+      <div class="glass">&#128269;</div>
+      <div class="row prof">
+        <input id="nameIn" maxlength="12" placeholder="Your name" autocomplete="off" />
+        <div id="colorRow" class="swatches"></div>
+      </div>
+      <div class="btncol">
+        <button id="bSolo" class="btn primary" type="button">PLAY SOLO</button>
+        <button id="bOnline" class="btn blue" type="button">PLAY ONLINE CO-OP</button>
+        <button id="bHow" class="btn alt small" type="button">HOW TO PLAY</button>
+      </div>
+      <p class="foot" id="titleFoot"></p>
+      <a id="arcadeLink" class="foot link" href="https://lizethbran13-cmyk.github.io/grok-arcade/">&larr; Grok Arcade</a>
+    </div>
+  </div>
+
+  <div id="scrOnline" class="screen hidden">
+    <div class="card">
+      <h2>ONLINE CO-OP</h2>
+      <p class="sub">Solve cases together! 2&ndash;3 detectives, each on their own phone.</p>
+      <button id="bHost" class="btn primary" type="button">HOST A ROOM</button>
+      <div class="or">or join a friend's room</div>
+      <div class="row join">
+        <input id="codeIn" maxlength="5" placeholder="CODE" autocomplete="off" autocapitalize="characters" spellcheck="false" />
+        <button id="bJoin" class="btn blue" type="button">JOIN</button>
+      </div>
+      <div id="onlineMsg" class="msg"></div>
+      <button id="bOnlineBack" class="btn alt small" type="button">BACK</button>
+    </div>
+  </div>
+
+  <div id="scrCases" class="screen hidden">
+    <div class="card cases">
+      <div id="roomCode" class="code hidden"></div>
+      <h2 id="casesTitle">CHOOSE A CASE</h2>
+      <div id="lobbyPlayers" class="plist"></div>
+      <div id="caseList"></div>
+      <div id="casesWait" class="msg ok"></div>
+      <button id="bCasesBack" class="btn alt small" type="button">BACK</button>
+    </div>
+  </div>
+
+  <div id="scrHow" class="screen hidden top">
+    <div class="card help">
+      <h2>HOW TO PLAY</h2>
+      <ol>
+        <li><b>Explore</b> 5 places: Town Square, Mansion, Museum, Docks and Forest Cabin. Use the <b>MAP</b> to travel.</li>
+        <li><b>Search</b> anything with a <span class="mk q">?</span> above it. Walk up and tap <b>SEARCH</b>, or just tap the object.</li>
+        <li><b>Talk</b> to people with a <span class="mk t">&hellip;</span> bubble. Suspects tell you about themselves. Witnesses give clues.</li>
+        <li>Your <b>CASEBOOK</b> keeps every clue and what you learned about each suspect.</li>
+        <li>Stuck? Tap <b>LENS</b>: your magnifying glass makes hidden clues glow.</li>
+        <li>When you know who did it, tap <b>ACCUSE</b>: pick the culprit and the evidence that proves it. Wrong guesses give you a hint.</li>
+        <li><b>Co-op:</b> every clue a partner finds goes into everyone's casebook. Accusations need everyone to agree.</li>
+      </ol>
+      <p class="sub">The culprit and clue spots change every time you play!</p>
+      <button id="bHowBack" class="btn primary" type="button">GOT IT</button>
+    </div>
+  </div>
+
+  <div id="pnl" class="screen hidden"><div class="card" id="pnlCard"></div></div>
+  <div id="talk" class="hidden">
+    <div id="talkBox"><img id="talkImg" alt="" /><div id="talkMain"><div id="talkName"></div><div id="talkText"></div><div id="talkClue" class="hidden"></div></div></div>
+    <div id="talkBtns"><button id="talkNext" class="btn primary" type="button">NEXT &#9654;</button></div>
+  </div>
+  <div id="vote" class="hidden"></div>
+
+  <div id="scrMenu" class="screen hidden top">
+    <div class="card">
+      <h2>PAUSED</h2>
+      <p class="sub" id="menuSub"></p>
+      <div class="btncol">
+        <button id="bResume" class="btn primary" type="button">RESUME</button>
+        <button id="bMenuHow" class="btn" type="button">HOW TO PLAY</button>
+        <button id="bCaseSel" class="btn blue" type="button">CASE SELECT</button>
+        <button id="bQuit" class="btn alt" type="button">QUIT TO TITLE</button>
+      </div>
+    </div>
+  </div>
+  <div id="fade"></div>
+
+  <script src="three.min.js"></script>
+  <script src="peerjs.min.js"></script>
+  <script src="grok-net.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/world.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
