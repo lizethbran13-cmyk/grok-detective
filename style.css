@@ -250,3 +250,9 @@ body.kbd #joyzone { display: none; }
 @keyframes rvPop { to { transform: scale(1); } }
 body.revealing #hud, body.revealing #toasts { display: none; }
 #lockBox a.btn{text-decoration:none;display:flex;align-items:center;justify-content:center}
+@media (max-height: 560px) and (orientation: landscape) {
+  #sidebtns { flex-wrap: wrap; justify-content: flex-end; max-width: 206px; }
+  .sbtn { width: 62px; height: 52px; }
+  .sbtn i { font-size: 22px; }
+  .sbtn span { font-size: 10px; }
+}

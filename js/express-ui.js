@@ -189,11 +189,12 @@ EX.reveal = function (cb) {
   ov.innerHTML = '<div class="rvTop">THE THIEF IS...</div><div class="rvName"></div><button class="btn alt small" id="bRevealSkip" data-a="revealSkip">SKIP</button>'; ov.className = 'on';
   document.body.classList.add('revealing');
   X.Snd.fx('reveal');
-  const tags = []; hot.g.traverse((o) => { if (o.isSprite && o.visible) { o.visible = false; tags.push(o); } });
+  const tags = []; W.cur.hots.forEach((x) => { if (x.g && x.kind === 'npc') x.g.traverse((o) => { if (o.isSprite && o.visible) { o.visible = false; tags.push(o); } }); }); hot.g.traverse((o) => { if (o.isSprite && o.visible) { o.visible = false; tags.push(o); } });
   GS.reveal = { t: 0, cb, hot, sus, grp, cone, cheese, conf, ov, stage: 0, tags };
 };
 EX.revealTick = function (dt) {
   const r = GS.reveal; if (!r) return; r.t += dt; const t = r.t, h = r.hot, cam = W.camera;
+  W.cur.hots.forEach((x) => { [x.marker, x.ring, x.beam].forEach((m) => { if (m && m.visible) { m.visible = false; if (r.tags.indexOf(m) < 0) r.tags.push(m); } }); });
   const ang = -0.5 + t * 0.3, R = Math.max(4.8, 7.5 - t * 1.3);
   cam.position.set(h.x + Math.sin(ang) * R, 2.1 + Math.max(0, 2.4 - t), h.z + Math.cos(ang) * R); cam.lookAt(h.x, 1.25, h.z);
   h.g.rotation.y = Math.atan2(cam.position.x - h.x, cam.position.z - h.z);
