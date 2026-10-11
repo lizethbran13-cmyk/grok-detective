@@ -13,12 +13,12 @@ function B(w, h, d, col, x, y, z, p) { return add(G.box, typeof col === 'object'
 function C(r, h, col, x, y, z, p, seg8) { return add(seg8 ? G.cyl8 : G.cyl, typeof col === 'object' ? col : M(col), x, y + h / 2, z, r, h, r, p); }
 function S(r, col, x, y, z, p) { return add(G.sph, typeof col === 'object' ? col : M(col), x, y, z, r, r, r, p); }
 function CN(r, h, col, x, y, z, p) { return add(G.cone, M(col), x, y + h / 2, z, r, h, r, p); }
-W.M = M; W.B = B; W.C = C; W.S = S;
+W.M = M; W.MB = MB; W.B = B; W.C = C; W.S = S; W.CN = CN; W.add = add; W.G = G;
 
 /* ---------------- canvas helpers ---------------- */
 function canvasTex(w, h, draw) { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new T.CanvasTexture(c); t.anisotropy = 4; return t; }
 function rr(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
-W.rr = rr;
+W.rr = rr; W.canvasTex = canvasTex;
 function textSprite(text, opts) {
   opts = opts || {};
   const fs = opts.size || 44, pad = 14, c = document.createElement('canvas'), g = c.getContext('2d');
@@ -54,10 +54,11 @@ W.init = function (canvas) {
   r.outputEncoding = T.sRGBEncoding;
   const sc = W.scene = new T.Scene(); sc.background = new T.Color('#9fdcff');
   W.camera = new T.PerspectiveCamera(48, 1, 0.5, 200);
-  const hemi = new T.HemisphereLight(0xffffff, 0x8c7a6a, 0.75); sc.add(hemi);
-  const sun = new T.DirectionalLight(0xffffff, 0.75); sun.position.set(6, 14, 8); sc.add(sun);
+  const hemi = W.hemi = new T.HemisphereLight(0xffffff, 0x8c7a6a, 0.75); sc.add(hemi);
+  const sun = W.sun = new T.DirectionalLight(0xffffff, 0.75); sun.position.set(6, 14, 8); sc.add(sun);
   W.areas = {}; W.cur = null; W.remotes = {}; W.ray = new T.Raycaster(); W.time = 0;
   glowTex = canvasTex(128, 128, (g) => { const gr = g.createRadialGradient(64, 64, 4, 64, 64, 62); gr.addColorStop(0, 'rgba(255,255,255,1)'); gr.addColorStop(0.5, 'rgba(255,255,255,.45)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); });
+  W.glowTex = glowTex;
   W.resize();
 };
 let glowTex;
@@ -83,6 +84,8 @@ W.makeChar = function (look, opts) {
   B(0.06, 0.08, 0.02, '#111', -0.1, 0.02, 0.29, head); B(0.06, 0.08, 0.02, '#111', 0.1, 0.02, 0.29, head);
   B(0.12, 0.03, 0.02, '#a8483a', 0, -0.12, 0.29, head);
   if (look.glasses) { const gm = M('#111'); add(G.torus, gm, -0.11, 0.06, 0.3, 0.075, 0.075, 0.5, head); add(G.torus, gm, 0.11, 0.06, 0.3, 0.075, 0.075, 0.5, head); B(0.06, 0.02, 0.02, gm, 0, 0.0, 0.3, head).position.y = 0.06; }
+  if (look.mustache) { B(0.26, 0.06, 0.06, look.mustache, 0, -0.07, 0.3, head); }
+  if (look.bowtie) { B(0.2, 0.08, 0.06, look.bowtie, 0, 1.12 * s - 0.02, 0.17, g); }
   if (look.beard) { B(0.42, 0.16, 0.12, look.hair === '#cfcfcf' ? '#ddd' : look.hair, 0, -0.2, 0.22, head); }
   const hs = look.hs || 'short';
   if (hs !== 'bald') {
@@ -103,6 +106,8 @@ W.makeChar = function (look, opts) {
     else if (h2 === 'deer') { S(0.34, hc, 0, 0.14, 0, head).scale.set(0.34, 0.22, 0.36); B(0.3, 0.04, 0.2, hc, 0, 0.12, 0.34, head); B(0.3, 0.04, 0.2, hc, 0, 0.12, -0.34, head); }
   }
   if (look.scarf) { const sm = add(G.torus, M(look.scarf), 0, 1.12 * s + 0.05, 0, 0.24, 0.24, 1.8, g); sm.rotation.x = Math.PI / 2; B(0.12, 0.34, 0.06, look.scarf, 0.12, 1.12 * s - 0.25, 0.2, g); }
+  if (look.vest) { B(0.52, 0.42, 0.32, look.vest, 0, 0.7, 0, body); }
+  if (look.pearls) { const pm = M('#fdf8f0'); for (let i = 0; i < 9; i++) { const a = -0.9 + i * 0.225; S(0.035, pm, Math.sin(a) * 0.2, 1.12 * s - 0.04 - Math.cos(a) * 0.08 + 0.08, 0.13 + Math.cos(a) * 0.04, g); } }
   if (look.coat) { B(0.56, 0.62, 0.36, look.coat, 0, 0.42, 0, body); B(0.14, 0.44, 0.17, look.coat, 0, -0.38, 0, armL); B(0.14, 0.44, 0.17, look.coat, 0, -0.38, 0, armR); }
   const ch = { g, body, head, legL, legR, armL, armR, ph: Math.random() * 6, h: 1.12 * s + 0.65 };
   ch.anim = function (dt, sp) {
@@ -128,6 +133,24 @@ W.makeDog = function () {
   ch.anim = function (dt, sp) { ch.ph += dt * (sp > 0.1 ? 14 : 6); tail.rotation.z = Math.sin(ch.ph * 1.6) * 0.6; const a = sp > 0.1 ? Math.sin(ch.ph) * 0.6 : 0; legs.forEach((l, i) => { l.rotation.x = (i % 2 ? a : -a); }); };
   return ch;
 };
+W.makeTortoise = function () {
+  const g = new T.Group(), body = new T.Group(); g.add(body);
+  const shellTex = canvasTex(128, 64, (q) => { q.fillStyle = '#4f7f2f'; q.fillRect(0, 0, 128, 64); q.strokeStyle = '#2f5a1a'; q.lineWidth = 4; for (let j = 0; j < 3; j++) for (let i = 0; i < 6; i++) { const cx = i * 24 + (j % 2) * 12, cy = 8 + j * 22; q.fillStyle = (i + j) % 2 ? '#6a9a3e' : '#5d8c36'; q.beginPath(); for (let k = 0; k < 6; k++) { const a = k / 6 * TAU; q.lineTo(cx + Math.cos(a) * 11, cy + Math.sin(a) * 10); } q.closePath(); q.fill(); q.stroke(); } });
+  shellTex.encoding = T.sRGBEncoding;
+  const shell = add(new T.SphereGeometry(1, 18, 10, 0, TAU, 0, Math.PI / 2), new T.MeshLambertMaterial({ map: shellTex }), 0, 0.14, 0, 0.42, 0.34, 0.5, body);
+  C(0.44, 0.06, '#c9b27a', 0, 0.12, 0, body).scale.set(0.44, 0.06, 0.52);
+  const skin = '#9ccf6e', head = new T.Group(); head.position.set(0, 0.26, 0.5); body.add(head);
+  C(0.07, 0.16, skin, 0, -0.12, -0.06, head).rotation.x = 0.9;
+  S(0.13, skin, 0, 0.02, 0.04, head).scale.set(0.12, 0.11, 0.14);
+  S(0.025, '#111', -0.06, 0.05, 0.13, head); S(0.025, '#111', 0.06, 0.05, 0.13, head);
+  B(0.06, 0.012, 0.01, '#2d4a1c', 0, -0.02, 0.17, head);
+  S(0.04, '#f472b6', 0.07, 0.13, 0.02, head); S(0.02, '#fde047', 0.07, 0.14, 0.05, head);
+  const legs = []; [[-0.28, 0.26], [0.28, 0.26], [-0.28, -0.26], [0.28, -0.26]].forEach((p) => { const l = new T.Group(); l.position.set(p[0], 0.14, p[1]); body.add(l); C(0.07, 0.14, skin, 0, -0.14, 0, l); legs.push(l); });
+  C(0.03, 0.1, skin, 0, 0.1, -0.5, body).rotation.x = -1.2;
+  const ch = { g, body, head, legs, ph: Math.random() * 6, h: 0.62, small: true };
+  ch.anim = function (dt, sp) { ch.ph += dt * (sp > 0.1 ? 6 : 1.5); head.position.z = 0.5 + Math.sin(ch.ph * 0.7) * 0.03; head.rotation.y = Math.sin(ch.ph * 0.4) * 0.3; const a = sp > 0.1 ? Math.sin(ch.ph) * 0.4 : 0; legs.forEach((l, i) => { l.rotation.x = i % 2 ? a : -a; }); };
+  return ch;
+};
 W.detectiveLook = function (color) { return { skin: '#f2c6a0', hair: '#3b2414', hs: 'short', shirt: '#f8fafc', pants: '#334155', coat: color, hat: '#8b5a2b', hs2: 'deer', boots: false }; };
 
 /* ---------------- 2D portraits (UI) ---------------- */
@@ -137,7 +160,14 @@ W.portrait = function (look, key, dog) {
   const c = document.createElement('canvas'); c.width = c.height = 160; const g = c.getContext('2d');
   g.fillStyle = '#ffeec2'; g.beginPath(); g.arc(80, 80, 78, 0, TAU); g.fill();
   g.save(); g.beginPath(); g.arc(80, 80, 78, 0, TAU); g.clip();
-  if (dog) {
+  if (look && look.tortoise) {
+    g.fillStyle = '#5f8f3a'; g.beginPath(); g.ellipse(80, 132, 70, 46, 0, Math.PI, TAU); g.fill();
+    g.fillStyle = '#8bbf5a'; for (let i = 0; i < 5; i++) { g.beginPath(); g.ellipse(26 + i * 27, 116 + Math.abs(i - 2) * 6, 11, 9, 0, 0, TAU); g.fill(); }
+    g.fillStyle = '#9ccf6e'; g.beginPath(); g.ellipse(80, 70, 38, 34, 0, 0, TAU); g.fill(); g.fillRect(64, 90, 32, 40);
+    g.fillStyle = '#111'; g.beginPath(); g.arc(66, 66, 7, 0, TAU); g.arc(94, 66, 7, 0, TAU); g.fill(); g.fillStyle = '#fff'; g.beginPath(); g.arc(68, 63, 2.5, 0, TAU); g.arc(96, 63, 2.5, 0, TAU); g.fill();
+    g.strokeStyle = '#2d4a1c'; g.lineWidth = 4; g.beginPath(); g.arc(80, 82, 12, 0.25, Math.PI - 0.25); g.stroke();
+    g.fillStyle = '#f472b6'; g.beginPath(); g.arc(104, 38, 10, 0, TAU); g.fill(); g.fillStyle = '#fde047'; g.beginPath(); g.arc(104, 38, 4, 0, TAU); g.fill();
+  } else if (dog) {
     g.fillStyle = '#8b9099'; rr(g, 38, 40, 84, 90, 26); g.fill(); g.fillStyle = '#4b5563'; rr(g, 30, 38, 22, 44, 10); g.fill(); rr(g, 108, 38, 22, 44, 10); g.fill();
     g.fillStyle = '#e5e7eb'; rr(g, 50, 92, 60, 44, 18); g.fill(); rr(g, 48, 62, 64, 10, 5); g.fill();
     g.fillStyle = '#111'; g.fillRect(58, 76, 10, 10); g.fillRect(92, 76, 10, 10); rr(g, 70, 96, 20, 14, 6); g.fill();
@@ -156,6 +186,9 @@ W.portrait = function (look, key, dog) {
     if (look.beard) { g.fillStyle = look.hair === '#cfcfcf' ? '#ddd' : look.hair; g.beginPath(); g.ellipse(80, 108, 30, 16, 0, 0, Math.PI); g.fill(); }
     g.fillStyle = '#111'; g.fillRect(62, 74, 8, 11); g.fillRect(90, 74, 8, 11);
     g.strokeStyle = '#a8483a'; g.lineWidth = 4; g.beginPath(); g.arc(80, 94, 10, 0.2, Math.PI - 0.2); g.stroke();
+    if (look.mustache) { g.fillStyle = look.mustache; g.beginPath(); g.ellipse(70, 90, 12, 5, 0.2, 0, TAU); g.ellipse(90, 90, 12, 5, -0.2, 0, TAU); g.fill(); }
+    if (look.bowtie) { g.fillStyle = look.bowtie; g.beginPath(); g.moveTo(80, 126); g.lineTo(62, 116); g.lineTo(62, 136); g.closePath(); g.moveTo(80, 126); g.lineTo(98, 116); g.lineTo(98, 136); g.closePath(); g.fill(); }
+    if (look.pearls) { g.fillStyle = '#fdf8f0'; for (let i = 0; i < 7; i++) { g.beginPath(); g.arc(56 + i * 8, 124 + Math.sin(i / 6 * Math.PI) * 8, 4, 0, TAU); g.fill(); } }
     if (look.glasses) { g.strokeStyle = '#111'; g.lineWidth = 4; g.beginPath(); g.arc(66, 80, 12, 0, TAU); g.moveTo(106, 80); g.arc(94, 80, 12, 0, TAU); g.moveTo(78, 80); g.lineTo(82, 80); g.stroke(); }
     if (look.hat) {
       const h2 = look.hs2 || 'cap'; g.fillStyle = look.hat;
@@ -302,6 +335,8 @@ function buildArea(id) {
     const s = textSprite('CABIN', { size: 40, h: 0.5, bg: '#8b5a2b', border: '#fff' }); s.position.set((cb[0] + cb[1]) / 2, 3.1, cb[2]); g.add(s);
     A.trees.forEach((t, i) => { tree(t[0], t[1], g, 0.9 + (i % 3) * 0.15); cols.push({ c: 1, x: t[0], z: t[1], r: 0.45 }); });
     for (let i = 0; i < 14; i++) { const a = i * 2.3; S(0.4, '#22c55e', Math.cos(a) * 15.5, 0.2, Math.sin(a) * 13, g); }
+  } else if (A.train && W.buildTrain) {
+    W.buildTrain(id, g, cols, box);
   } else {
     // interiors
     (A.floors || []).forEach((f) => ground(g, f[0], f[1], f[2], f[3], f[4] === 'checker' ? 'checker' : f[4] === '#e8dcc4' ? 'marble' : f[4], 2, 0.0));
@@ -320,9 +355,10 @@ function buildArea(id) {
   const hots = [];
   A.objs.forEach((o) => hots.push(placeObj(o, g, cols, id)));
   // travel sign
-  const sg = new T.Group(); sg.position.set(A.sign[0], 0, A.sign[1]); g.add(sg); P.sign(sg); cols.push({ c: 1, x: A.sign[0], z: A.sign[1], r: 0.35 });
-  const sh = { id: 'sign', name: 'Travel Map', kind: 'sign', x: A.sign[0], z: A.sign[1], reach: 1.6, g: sg, h: 2.2 }; tagHot(sh); addMarker(sh, 'sign', g); hots.push(sh);
+  if (A.sign) { const sg = new T.Group(); sg.position.set(A.sign[0], 0, A.sign[1]); g.add(sg); P.sign(sg); cols.push({ c: 1, x: A.sign[0], z: A.sign[1], r: 0.35 });
+  const sh = { id: 'sign', name: 'Travel Map', kind: 'sign', x: A.sign[0], z: A.sign[1], reach: 1.6, g: sg, h: 2.2 }; tagHot(sh); addMarker(sh, 'sign', g); hots.push(sh); }
   const caseG = new T.Group(); g.add(caseG);
+  if (A.doors && W.trainDoors) W.trainDoors(id, g, cols, hots);
   W.areas[id] = { id, g, cols, baseCols: cols.length, hots, baseHots: hots.length, caseG, npcs: [] };
 }
 function placeObj(o, g, cols, areaId) {
@@ -346,12 +382,13 @@ function addMarker(h, kind, p) {
   const beam = new T.Mesh(G.cyl, new T.MeshBasicMaterial({ color: '#ffe36b', transparent: true, opacity: 0, depthWrite: false, blending: T.AdditiveBlending }));
   beam.position.set(h.x, 2.5, h.z); beam.scale.set(0.18, 5, 0.18); beam.renderOrder = 5; p.add(beam); h.beam = beam;
 }
+W.P = P; W.placeObj = placeObj; W.tagHot = tagHot; W.addMarker = addMarker; W.ground = ground; W.tree = tree; W.floorTex = floorTex;
 W.setMarker = function (h, kind) { if (!h.marker || h.mk === kind) return; h.mk = kind; h.marker.material.map = markerTex(kind); h.marker.material.needsUpdate = true; };
 
 /* build per-case content: extras + NPCs */
-W.ensureAreas = function () { GD.AREA_ORDER.forEach((id) => { if (!W.areas[id]) buildArea(id); }); };
+W.ensureAreas = function (list) { (list || GD.AREA_ORDER).forEach((id) => { if (!W.areas[id]) buildArea(id); }); };
 W.buildCase = function (c, extraPos) {
-  W.ensureAreas();
+  W.ensureAreas(GD.caseAreas(c));
   for (const id in W.areas) {
     const a = W.areas[id];
     a.g.remove(a.caseG); a.caseG = new T.Group(); a.g.add(a.caseG);
@@ -360,8 +397,8 @@ W.buildCase = function (c, extraPos) {
   GD.extraObjs(c, extraPos).forEach((o) => { const a = W.areas[o.area]; a.hots.push(placeObj(o, a.caseG, a.cols, o.area)); });
   GD.people(c).forEach((p) => {
     const a = W.areas[p.area], sp = GD.AREAS[p.area].npc[p.spot];
-    const ch = p.kind === 'dog' ? W.makeDog() : W.makeChar(p.look);
-    ch.g.position.set(sp[0], 0, sp[1]); ch.g.rotation.y = 0; a.caseG.add(ch.g);
+    const ch = p.kind === 'dog' ? W.makeDog() : p.look && p.look.tortoise ? W.makeTortoise() : W.makeChar(p.look);
+    ch.g.position.set(sp[0], 0, sp[1]); ch.g.rotation.y = 0; a.caseG.add(ch.g); if (p.seated) ch.seated = p.seated;
     const tag = textSprite(p.name, { size: 36, h: 0.36, bg: p.kind === 'suspect' ? 'rgba(190,18,60,.88)' : p.kind === 'victim' ? 'rgba(37,99,235,.9)' : 'rgba(22,163,74,.9)' });
     tag.position.set(0, ch.h + 0.45, 0); ch.g.add(tag);
     a.cols.push({ c: 1, x: sp[0], z: sp[1], r: 0.42, npc: 1 });
@@ -372,7 +409,8 @@ W.buildCase = function (c, extraPos) {
 W.setArea = function (id) {
   for (const k in W.areas) W.areas[k].g.visible = k === id;
   W.cur = W.areas[id]; const A = GD.AREAS[id];
-  W.scene.background = new T.Color(A.outdoor ? (id === 'forest' ? '#a7e3a0' : '#9fdcff') : '#2a1d46');
+  W.scene.background = new T.Color(A.sky || (A.outdoor ? (id === 'forest' ? '#a7e3a0' : '#9fdcff') : '#2a1d46'));
+  const L = A.light || [0xffffff, 0x8c7a6a, 0.75, 0xffffff, 0.75]; W.hemi.color.set(L[0]); W.hemi.groundColor.set(L[1]); W.hemi.intensity = L[2]; W.sun.color.set(L[3]); W.sun.intensity = L[4];
 };
 
 /* ---------------- collisions ---------------- */
@@ -438,6 +476,7 @@ W.tick = function (dt) {
   W.time += dt;
   if (W.tapRing) { W.tapT = Math.max(0, (W.tapT || 0) - dt); const k = W.tapT / 0.6; W.tapRing.material.opacity = k * 0.9; const s = 0.25 + (1 - k) * 0.35; W.tapRing.scale.set(s, s, s); }
   if (W.water) W.water.position.y = -0.35 + Math.sin(W.time * 1.3) * 0.04;
+  if (W.trainTick && W.cur && GD.AREAS[W.cur.id].train) W.trainTick(dt, W.cur);
 };
 W.render = function () { W.renderer.render(W.scene, W.camera); };
 })();

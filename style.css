@@ -187,3 +187,65 @@ body.kbd #joyzone { display: none; }
   #toasts { left: 10px; transform: none; width: calc(100vw - 112px); align-items: flex-start; }
   .toast { font-size: 15px; text-align: left; }
 }
+
+/* ===== Midnight Express DLC ===== */
+.sbtn.dis { background: linear-gradient(180deg,#a855f7,#6d28d9); }
+.btn.wide { width: 100%; margin-bottom: 10px; }
+.dlcCard { background: linear-gradient(135deg,#fff7e0,#fff); }
+.dlcCard.locked { background: repeating-linear-gradient(135deg,#f5f0ff 0 14px,#ebe4ff 14px 28px); }
+.dlcCard.locked .ci { background: #6b5aa8; }
+.dlcTag { display: inline-block; font-size: 11px; font-weight: 900; padding: 2px 7px; border-radius: 8px; background: #d01f5a; color: #fff; vertical-align: middle; letter-spacing: .5px; }
+.clue { position: relative; }
+.clue.k-alibi { border-color: #86efac; background: #f0fdf4; }
+.shareBtn { float: right; margin: -2px -4px 4px 8px; min-height: 34px; padding: 4px 10px; border-radius: 14px; border: 2px solid #1a7ad8; background: #e0f2fe; color: #0c4a6e; font-size: 13px; font-weight: 800; }
+.disGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.disBtn { position: relative; border-radius: 16px; border: 3px solid #cfc2f5; background: #fff; color: var(--ink); padding: 8px 6px; display: flex; flex-direction: column; align-items: center; gap: 2px; min-height: 150px; }
+.disBtn img { width: 74px; height: 74px; }
+.disBtn b { font-size: 16px; }
+.disBtn small { font-size: 12px; color: #5a4a7a; line-height: 1.2; }
+.disBtn.on { border-color: #d97706; background: #fff1d6; }
+.disBtn em { position: absolute; top: 6px; right: 6px; font-style: normal; font-size: 10px; font-weight: 900; background: #d97706; color: #fff; padding: 2px 6px; border-radius: 8px; }
+.dustWrap { position: relative; width: 100%; max-width: 340px; margin: 0 auto; border-radius: 16px; overflow: hidden; border: 4px solid #1b1440; touch-action: none; }
+#dustCv { display: block; width: 100%; height: auto; touch-action: none; }
+#dustBrush { position: absolute; left: 50%; top: 50%; font-size: 30px; transform: translate(-20%,-80%); pointer-events: none; }
+.dustBar { height: 14px; border-radius: 8px; background: #e9e0c9; margin: 10px auto 6px; max-width: 340px; overflow: hidden; }
+.dustBar i { display: block; height: 100%; width: 0; background: linear-gradient(90deg,#a78bfa,#6d28d9); transition: width .1s; }
+.cork { position: relative; border-radius: 16px; border: 6px solid #6b4226; padding: 10px 6px; margin-bottom: 10px; background-color: #c8955a; background-image: radial-gradient(#b07c45 1px, transparent 1.5px), radial-gradient(#dcae74 1px, transparent 1.5px); background-size: 9px 9px, 13px 13px; background-position: 0 0, 4px 6px; }
+#corkSvg { position: absolute; left: 0; top: 0; pointer-events: none; z-index: 0; }
+.polRow, .noteRow { position: relative; z-index: 1; }
+.polRow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 34px; }
+.pol { position: relative; background: #fff; border: 0; border-radius: 4px; padding: 6px 4px 6px; box-shadow: 0 3px 6px rgba(0,0,0,.3); color: var(--ink); display: flex; flex-direction: column; align-items: center; transform: rotate(-1.5deg); }
+.pol:nth-child(2n) { transform: rotate(1.8deg); }
+.pol img { width: 64px; height: 64px; }
+.pol b { font-size: 13px; line-height: 1.1; margin: 2px 0; }
+.pol .chips { display: flex; flex-direction: column; gap: 2px; width: 100%; }
+.chip { font-size: 10px; font-weight: 800; border-radius: 6px; background: #ede9fe; padding: 1px 3px; }
+.chip.unk { color: #8a7aaa; background: #f3f0fa; }
+.chip.ok { background: #fecaca; color: #991b1b; }
+.chip.no { background: #e5e7eb; color: #6b7280; text-decoration: line-through; }
+.pol.out img { filter: grayscale(1) opacity(.6); }
+.stamp { position: absolute; top: 30px; left: 50%; transform: translateX(-50%) rotate(-14deg); font-style: normal; font-weight: 900; font-size: 13px; padding: 2px 6px; border: 3px solid; border-radius: 6px; background: rgba(255,255,255,.85); letter-spacing: 1px; }
+.stamp.g { color: #15803d; border-color: #15803d; }
+.stamp.r { color: #b91c1c; border-color: #b91c1c; }
+.stamp.m { color: #7c3aed; border-color: #7c3aed; }
+.pol .mk { position: absolute; top: 2px; right: 4px; font-size: 22px; }
+.pol .mby { position: absolute; top: 26px; right: 2px; font-size: 9px; color: #6a5a8a; }
+.pin { position: absolute; top: -5px; left: 50%; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #ff8a8a, #b91c1c); box-shadow: 0 2px 2px rgba(0,0,0,.4); z-index: 3; }
+.noteRow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 8px; }
+.note { position: relative; text-align: left; padding: 10px 8px 8px; background: #fef08a; box-shadow: 0 3px 5px rgba(0,0,0,.28); transform: rotate(var(--r)); font-size: 12px; color: #1b1440; }
+.note b { display: block; font-size: 13px; margin: 2px 0; }
+.note p { line-height: 1.25; }
+.note .tag { font-size: 9px; font-weight: 900; color: #6d28d9; letter-spacing: .5px; }
+.note.k-motive { background: #f5d0fe; } .note.k-alibi { background: #bbf7d0; } .note.k-trait { background: #fecaca; } .note.k-scene { background: #fff; }
+.note.hl { outline: 4px solid #22d3ee; animation: notePulse 1s ease-in-out infinite alternate; }
+@keyframes notePulse { to { outline-color: #fde047; } }
+.note .shareBtn { float: none; display: block; margin: 6px 0 0; width: 100%; }
+#revealUI { position: fixed; inset: 0; z-index: 70; pointer-events: none; display: none; background: radial-gradient(ellipse at center, rgba(0,0,0,0) 35%, rgba(5,2,20,.8) 100%); }
+#revealUI.on { display: block; }
+#revealUI .rvTop { position: absolute; top: calc(70px + var(--st)); width: 100%; text-align: center; color: #fde047; font-size: 30px; font-weight: 900; letter-spacing: 3px; text-shadow: 0 3px 0 #000, 0 0 20px rgba(255,210,63,.7); animation: rvIn .5s ease-out; }
+#revealUI .rvName { position: absolute; bottom: calc(120px + var(--sb)); width: 100%; text-align: center; color: #fff; font-size: 40px; font-weight: 900; letter-spacing: 2px; text-shadow: 0 4px 0 #d01f5a, 0 0 24px #000; transform: scale(0); }
+#revealUI.named .rvName { animation: rvPop .45s cubic-bezier(.2,1.6,.4,1) forwards; }
+#revealUI #bRevealSkip { position: absolute; right: calc(12px + var(--sr)); bottom: calc(14px + var(--sb)); pointer-events: auto; }
+@keyframes rvIn { from { opacity: 0; transform: translateY(-20px); } }
+@keyframes rvPop { to { transform: scale(1); } }
+body.revealing #hud, body.revealing #toasts { display: none; }

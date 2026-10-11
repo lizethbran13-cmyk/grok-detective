@@ -345,18 +345,20 @@ GD.setupCase = function (c, rnd) {
   const herring = pick(c.suspects.filter((s) => s.id !== culprit)).id;
   const extraPos = {};
   (c.extras || []).forEach((e) => { extraPos[e.id] = Math.floor(rnd() * e.pos.length); });
+  let alibis = [];
+  if (c.alibiCount) { const pool = c.suspects.filter((s) => s.id !== culprit && s.id !== herring && s.alibi).map((s) => s.id); while (alibis.length < c.alibiCount && pool.length) alibis.push(pool.splice(Math.floor(rnd() * pool.length), 1)[0]); }
   const used = {}, place = {};
-  const all = GD.caseClues(c, culprit, herring);
+  const all = GD.caseClues(c, culprit, herring, alibis);
   all.forEach((cl) => {
     if (cl.witness) return;
     let opts = cl.spots.filter((s) => !used[s]);
     if (!opts.length) { const area = GD.objArea(c, cl.spots[0]); opts = GD.areaObjIds(c, area).filter((s) => !used[s]); }
     const s = pick(opts); used[s] = 1; place[cl.id] = s;
   });
-  return { culprit, herring, place, extraPos };
+  return { culprit, herring, place, extraPos, alibis };
 };
 // every clue in play for this culprit/herring, with resolved name/text
-GD.caseClues = function (c, culprit, herring) {
+GD.caseClues = function (c, culprit, herring, alibis) {
   const cs = c.suspects.find((s) => s.id === culprit), out = [];
   c.clues.forEach((cl) => {
     const o = { id: cl.id, spots: cl.spots || [], witness: !!cl.witness, kind: cl.trait ? 'trait' : 'scene' };
@@ -365,16 +367,18 @@ GD.caseClues = function (c, culprit, herring) {
     out.push(o);
   });
   [culprit, herring].forEach((sid) => { const s = c.suspects.find((q) => q.id === sid); out.push({ id: 'm_' + sid, kind: 'motive', about: sid, name: s.motive.name, text: s.motive.text, spots: s.motive.spots }); });
+  (alibis || []).forEach((sid) => { const s = c.suspects.find((q) => q.id === sid); if (s && s.alibi) out.push({ id: 'a_' + sid, kind: 'alibi', about: sid, name: s.alibi.name, text: s.alibi.text, spots: s.alibi.spots }); });
   return out;
 };
 GD.extraObjs = function (c, extraPos) {
   return (c.extras || []).map((e) => { const p = e.pos[(extraPos && extraPos[e.id]) | 0] || e.pos[0]; return { id: e.id, name: e.name, kind: e.kind, area: e.area, x: p[0], z: p[1], text: e.text, rotN: e.rotN, extra: true }; });
 };
+GD.caseAreas = function (c) { return (c && c.areas) || GD.AREA_ORDER; };
 GD.objArea = function (c, id) {
   for (const a in GD.AREAS) if (GD.AREAS[a].objs.some((o) => o.id === id)) return a;
   const e = (c.extras || []).find((x) => x.id === id); return e ? e.area : null;
 };
 GD.areaObjIds = function (c, area) { return GD.AREAS[area].objs.map((o) => o.id).concat((c.extras || []).filter((e) => e.area === area).map((e) => e.id)); };
-GD.people = function (c) { const a = c.suspects.map((s) => Object.assign({ kind: 'suspect' }, s)); if (c.witness) a.push(Object.assign({ kind: 'witness' }, c.witness)); if (c.dog) a.push(Object.assign({ kind: 'dog' }, c.dog)); if (c.victim) a.push(Object.assign({ kind: 'victim' }, c.victim)); return a; };
+GD.people = function (c) { const a = c.suspects.map((s) => Object.assign({ kind: 'suspect' }, s)); if (c.witness) a.push(Object.assign({ kind: 'witness' }, c.witness)); (c.helpers || []).forEach((h) => a.push(Object.assign({ kind: 'witness' }, h))); if (c.dog) a.push(Object.assign({ kind: 'dog' }, c.dog)); if (c.victim) a.push(Object.assign({ kind: 'victim' }, c.victim)); return a; };
 GD.clueGiver = function (c, clueId) { return GD.people(c).find((p) => p.gives === clueId) || null; };
 })();
