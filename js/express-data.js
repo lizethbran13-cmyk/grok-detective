@@ -72,7 +72,7 @@ Object.assign(GD.AREAS, {
   tr_engine: car({ name: 'Engine', short: 'ENGINE', icon: '\ud83d\ude82', color: '#f87171', staff: true, doors: { w: 'tr_luggage' }, doorZ: 1.7, spawn: [-8, 1.8],
     walk: [[-11.4, 6.6, -3.4, 3.4]],
     objs: [
-      { id: 'eng_coal', name: 'Coal Pile', kind: 'coal', x: -8.2, z: -1.9, text: 'A mountain of black coal. Your hands are all sooty now.' },
+      { id: 'eng_coal', name: 'Coal Pile', kind: 'coal', x: -8.2, z: -1.9, r: 2.6, text: 'A mountain of black coal. Your hands are all sooty now.' },
       { id: 'eng_toolbox', name: 'Toolbox', kind: 'toolbox', x: -2.0, z: -3.3, text: 'Wrenches, an oil can and a sandwich wrapped in foil.' },
       { id: 'eng_whistle', name: 'Whistle Cord', kind: 'whistle', x: 1.6, z: -3.2, text: 'You pull the cord: TOOT TOOOOT! Everyone on the train jumps.' },
       { id: 'eng_gauges', name: 'Pressure Gauges', kind: 'gauges', x: 4.4, z: -3.3, text: 'The needles point to FAST and VERY FAST.' },

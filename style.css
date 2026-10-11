@@ -249,3 +249,4 @@ body.kbd #joyzone { display: none; }
 @keyframes rvIn { from { opacity: 0; transform: translateY(-20px); } }
 @keyframes rvPop { to { transform: scale(1); } }
 body.revealing #hud, body.revealing #toasts { display: none; }
+#lockBox a.btn{text-decoration:none;display:flex;align-items:center;justify-content:center}

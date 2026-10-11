@@ -604,7 +604,7 @@ function renderScreens() {
   const inGame = playing();
   $('hud').classList.toggle('hidden', !inGame);
   if (!inGame) { closeTalk(); if (GS.panel && GS.panel !== 'result') closePanel(); $('vote').classList.add('hidden'); voteKey = ''; $('toasts').style.top = ''; }
-  if (scr === 'scrTitle') { const n = Object.keys(save.solved).length, own = EXo().owned && EXo().owned(); $('titleFoot').textContent = GD.CASES.length + ' mysteries \u00b7 ' + (own ? '5 places + the Midnight Express train' : '5 places to explore') + ' \u00b7 solo or online co-op' + (n ? ' \u00b7 solved ' + n + '/' + GD.CASES.length : ''); }
+  if (scr === 'scrTitle') { const n = Object.keys(save.solved).length, own = EXo().owned && EXo().owned(); $('titleFoot').textContent = (own ? GD.CASES.length + ' mysteries' : GD.CASES.filter((c) => !c.dlc).length + ' mysteries (+1 DLC)') + ' \u00b7 ' + (own ? '5 places + the Midnight Express train' : '5 places to explore') + ' \u00b7 solo or online co-op' + (n ? ' \u00b7 solved ' + n + '/' + GD.CASES.length : ''); }
   if (scr === 'scrCases') {
     const online = GS.role !== 'solo', code = online && GS.room ? GS.room.code : '';
     const key = GS.role + code + JSON.stringify(S.players) + JSON.stringify(save.solved);
